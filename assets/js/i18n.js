@@ -141,7 +141,7 @@ window.I18N = {
     'ind.4.d': 'Engraving, cut lettering and small-batch personalised production.',
 
     'why.eyebrow': 'About us',
-    'why.title': 'Why customers stay with NovaLaser',
+    'why.title': 'Why customers stay with TSK Laser',
     'why.lead': 'We do not just ship a crate. We stay with you from the first call until the line runs on its own.',
     'why.1.t': 'Our own production',
     'why.1.d': 'Machines are built on proven platforms and can be adapted to your parts, your gases and your standards.',
@@ -356,7 +356,7 @@ window.I18N = {
     'ind.4.d': 'Гравіювання, різані літери й персоналізовані партії.',
 
     'why.eyebrow': 'Про нас',
-    'why.title': 'Чому клієнти лишаються з NovaLaser',
+    'why.title': 'Чому клієнти лишаються з TSK Laser',
     'why.lead': 'Ми не просто привозимо ящик. Ми поруч від першого дзвінка до моменту, коли лінія працює сама.',
     'why.1.t': 'Власне виробництво',
     'why.1.d': 'Верстати будуються на перевірених платформах і адаптуються під ваші деталі, гази та стандарти.',

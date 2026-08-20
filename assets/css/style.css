@@ -192,22 +192,22 @@ h3 { font-size: clamp(20px, 2.4vw, 26px); line-height: 1.2; }
   width: 100%;
 }
 
-.logo { display: inline-flex; align-items: center; gap: 11px; flex-shrink: 0; }
+.logo { display: inline-flex; align-items: center; flex-shrink: 0; }
 
-.logo__mark {
-  width: 34px;
-  height: 34px;
-  border-radius: 10px;
-  background: linear-gradient(135deg, var(--accent), #38a1ff);
-  display: grid;
-  place-items: center;
-  box-shadow: 0 8px 22px rgba(0, 117, 255, .4);
+/* Логотип — растровий файл із прозорим тлом. Варіант зі світлим текстом,
+   розрахований на темну підкладку сайту. Для світлих секцій є
+   assets/img/logo-dark-text.png. */
+.logo__img {
+  height: 40px;
+  width: auto;
+  display: block;
 }
 
-.logo__mark svg { width: 19px; height: 19px; }
+.footer .logo__img { height: 46px; }
 
-.logo__text { font-size: 18px; font-weight: 700; letter-spacing: -.01em; }
-.logo__text span { color: var(--accent); }
+@media (max-width: 640px) {
+  .logo__img { height: 32px; }
+}
 
 .nav { margin-left: auto; }
 
