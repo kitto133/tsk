@@ -384,51 +384,6 @@ h3 { font-size: clamp(20px, 2.4vw, 26px); line-height: 1.2; }
   box-shadow: var(--shadow);
 }
 
-.hero__beam {
-  position: absolute;
-  left: 50%;
-  top: 14%;
-  width: 3px;
-  height: 46%;
-  transform: translateX(-50%);
-  background: linear-gradient(180deg, transparent, #7cc0ff 24%, var(--white));
-  filter: drop-shadow(0 0 12px rgba(0, 117, 255, .9));
-  animation: beam 2.6s var(--ease) infinite;
-}
-
-@keyframes beam {
-  0%, 100% { height: 42%; opacity: .82; }
-  50%      { height: 50%; opacity: 1; }
-}
-
-.hero__spark {
-  position: absolute;
-  left: 50%;
-  top: 60%;
-  width: 118px;
-  height: 118px;
-  transform: translate(-50%, -50%);
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(255, 235, 190, .95), rgba(241, 158, 29, .42) 34%, transparent 68%);
-  animation: spark 2.6s var(--ease) infinite;
-}
-
-@keyframes spark {
-  0%, 100% { transform: translate(-50%, -50%) scale(.86); opacity: .75; }
-  50%      { transform: translate(-50%, -50%) scale(1.08); opacity: 1; }
-}
-
-.hero__plate {
-  position: absolute;
-  left: 12%;
-  right: 12%;
-  top: 61%;
-  height: 12px;
-  border-radius: 4px;
-  background: linear-gradient(90deg, #2a2c31, #4a4d55 50%, #2a2c31);
-  box-shadow: 0 22px 44px rgba(0, 0, 0, .6);
-}
-
 .hero__badge {
   position: absolute;
   left: 24px;
@@ -1857,4 +1812,63 @@ a.thanks__card:hover { transform: translateY(-5px); border-color: var(--accent);
   .quiz__title { padding-right: 0; }
   .thanks__actions .btn,
   .thanks__foot .btn { width: 100%; }
+}
+
+/* ==========================================================================
+   ФОТО ОБЛАДНАННЯ
+   --------------------------------------------------------------------------
+   Каталожні рендери зняті на білому тлі, а сайт темний. Тому контейнер з фото
+   робимо світлою карткою — тоді біле тло знімка зливається з нею, і не виникає
+   ефекту «яскравий прямокутник на чорному».
+   Блоки без фото (комплектуючі) лишаються темними зі схемою.
+   ========================================================================== */
+
+.product__media--photo {
+  background: linear-gradient(160deg, #ffffff 0%, #eef0f4 100%);
+  border-color: rgba(255, 255, 255, .14);
+  padding: 22px;
+}
+
+/* прибрати синє світіння, розраховане на темну підкладку */
+.product__media--photo::before { display: none; }
+
+.product__media--photo img {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  mix-blend-mode: multiply; /* прибирає залишковий сірий кант навколо рендера */
+}
+
+/* Підпис потужності на світлому тлі має бути темним, інакше не читається */
+.product__media--photo .product__power {
+  background: rgba(4, 4, 4, .82);
+  border-color: rgba(4, 4, 4, .3);
+  color: #ffffff;
+}
+
+/* --- Перший екран ---------------------------------------------------------- */
+.hero__panel--photo {
+  background: linear-gradient(160deg, #ffffff 0%, #e9ecf1 100%);
+  padding: 26px;
+  display: grid;
+  place-items: center;
+}
+
+.hero__panel--photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  mix-blend-mode: multiply;
+}
+
+/* бейдж поверх світлого фото лишається темним — контраст зберігається */
+.hero__panel--photo .hero__badge {
+  background: rgba(6, 6, 8, .88);
+  border-color: rgba(255, 255, 255, .16);
+}
+
+@media (max-width: 640px) {
+  .product__media--photo,
+  .hero__panel--photo { padding: 14px; }
 }
