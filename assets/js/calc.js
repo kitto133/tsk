@@ -1,61 +1,65 @@
 /* ==========================================================================
    Б-2. Калькулятор окупності
    --------------------------------------------------------------------------
-   УВАГА. Усі числа в CONFIG нижче — ОРІЄНТОВНІ, поставлені щоб калькулятор
-   працював. Перед публікацією їх треба замінити даними технічного відділу:
+   Числа в CONFIG — реальні, надані замовником (бриф, розділи 4.1 і 4.2,
+   станом на серпень 2026):
 
-     POWER          таблиця підбору потужності (матеріал × товщина)
-     MACHINE_PRICE  ціни моделей за потужністю
-     OPERATING      споживання електроенергії та газу, ресурс і ціна витратників
-     OUTSOURCE_RATE середня ціна різки на стороні, грн за метр
+     POWER / PRICE / SPEED  таблиця матеріал × товщина від технічного відділу
+     OPERATING              тариф 11 грн/кВт·год, газ 70 грн/год,
+                            витратники 25 грн/год, оператор 35 000 грн/міс
+     OUTSOURCE_RATE         75 грн за метр різки на стороні
 
-   Поки провізорні значення на місці, у результаті показується попередження.
+   Що лишається орієнтовним: зарплата оператора взята як середина наданого
+   діапазону 30 000–40 000 грн, а для комбінацій матеріал × товщина, яких
+   немає в таблиці, ціна підставляється за найближчою відомою (у результаті
+   показується попередження).
    ========================================================================== */
 (function () {
   'use strict';
 
   var CONFIG = {
-    /* Чи є числа ще орієнтовними. Поставте false, коли підставите реальні дані —
-       і попередження в результаті зникне. */
-    provisional: true,
+    /* Дані підтверджені замовником. true поверне попередження в результаті. */
+    provisional: false,
 
-    /* Рекомендована потужність, кВт: матеріал × товщина */
+    /* Рекомендована потужність, кВт: матеріал × товщина (бриф 4.1) */
     POWER: {
-      steel:  { t3: 1.5, t8: 3,   t20: 6,   t20p: 6 },
-      inox:   { t3: 2,   t8: 4,   t20: 6,   t20p: 6 },
-      alu:    { t3: 2,   t8: 3,   t20: 6,   t20p: 6 },
-      copper: { t3: 3,   t8: 4,   t20: 6,   t20p: 6 }
+      steel:  { t3: 1.5, t8: 3, t20: 6, t20p: 6 },
+      inox:   { t3: 2,   t8: 4, t20: 6, t20p: 6 },
+      alu:    { t3: 3,   t8: 3, t20: 6, t20p: 6 },
+      copper: { t3: 3,   t8: 4, t20: 6, t20p: 6 }
     },
 
-    /* Понад 16 год/добу — на одну сходинку потужніше, щоб був запас */
-    POWER_BUMP_HOURS: ['h16p'],
-
-    /* Ряд доступних потужностей — для округлення вгору після надбавки */
-    POWER_STEPS: [1.5, 2, 3, 4, 6],
-
-    /* Ціна верстата за потужністю, грн */
-    MACHINE_PRICE: {
-      1.5: 950000,
-      2:   1100000,
-      3:   1250000,
-      4:   1500000,
-      6:   1850000
+    /* Ціна верстата, грн: матеріал × товщина (бриф 4.1).
+       null — комбінації, яких у таблиці немає; підставляється найближча. */
+    PRICE: {
+      steel:  { t3: 1284008, t8: 1449977, t20: 2801309, t20p: null },
+      inox:   { t3: 1458586, t8: 1449977, t20: null,    t20p: null },
+      alu:    { t3: 1713556, t8: null,    t20: null,    t20p: null },
+      copper: { t3: 1767665, t8: null,    t20: null,    t20p: null }
     },
 
-    /* Експлуатація */
+    /* Швидкість різки, м/хв — для показу в результаті */
+    SPEED: {
+      steel:  { t3: '3,0–4,5', t8: '1,8–2,3', t20: '0,6–1,2', t20p: null },
+      inox:   { t3: '4,5–6,5', t8: '1,0–3,0', t20: null,      t20p: null },
+      alu:    { t3: '2,0–6,5', t8: null,      t20: null,      t20p: null },
+      copper: { t3: '5,0–15,0', t8: null,     t20: null,      t20p: null }
+    },
+
+    /* Експлуатація (бриф 4.2) */
     OPERATING: {
-      /* Повне споживання ≈ потужність джерела × цей коефіцієнт
+      /* Повне споживання = потужність джерела × коефіцієнт
          (джерело + чиллер + приводи + витяжка) */
       powerFactor: 2.2,
-      tariffKwh: 6.5,        /* грн за кВт·год */
+      tariffKwh: 11,          /* грн за кВт·год, тариф для підприємств 2026 */
       workDaysPerMonth: 22,
-      gasPerHour: 25,        /* грн за годину різки */
-      consumablesPerHour: 8, /* лінзи, сопла, кераміка — грн за годину */
-      operatorSalary: 25000  /* грн на місяць, один оператор */
+      gasPerHour: 70,         /* середнє по повітрю / кисню / азоту */
+      consumablesPerHour: 25, /* лінзи, сопла, кераміка; ресурс ≈ 800 год */
+      operatorSalary: 35000   /* середина діапазону 30 000–40 000 грн */
     },
 
     /* Якщо вказано метри різу замість витрат — оцінюємо поточні витрати */
-    OUTSOURCE_RATE: 45, /* грн за метр різки на стороні */
+    OUTSOURCE_RATE: 75, /* грн за метр різки на стороні */
 
     /* Середина інтервалу «годин на добу» для розрахунку */
     HOURS_MID: { h4: 3, h8: 6, h16: 12, h16p: 18 }
@@ -87,24 +91,50 @@
     return Math.round(value).toLocaleString('uk-UA') + ' грн';
   }
 
-  function stepUp(power) {
-    var steps = CONFIG.POWER_STEPS;
-    for (var i = 0; i < steps.length; i++) {
-      if (steps[i] > power) return steps[i];
-    }
-    return steps[steps.length - 1];
-  }
 
   /* ------------------------------------------------------------ розрахунок */
   /* Повертає { power, model, price, monthlyOperating, currentSpend,
                 savings, payback, warnings[] } */
+  /* Ціна для пари матеріал × товщина. Якщо саме такої комбінації в таблиці
+     немає — беремо найближчу відому товщину того ж матеріалу, далі чорну
+     сталь, і повідомляємо користувача, що ціна орієнтовна. */
+  function lookupPrice(material, thickness, warnings) {
+    var order = ['t3', 't8', 't20', 't20p'];
+    var row = CONFIG.PRICE[material] || CONFIG.PRICE.steel;
+
+    if (row[thickness]) return row[thickness];
+
+    var idx = order.indexOf(thickness);
+    for (var d = 1; d < order.length; d++) {
+      var lower = order[idx - d], higher = order[idx + d];
+      if (higher && row[higher]) {
+        warnings.push('Для цієї товщини ціни в таблиці немає — показана за найближчою ' +
+                      'конфігурацією. Точну назве інженер.');
+        return row[higher];
+      }
+      if (lower && row[lower]) {
+        warnings.push('Для цієї товщини ціни в таблиці немає — показана за найближчою ' +
+                      'конфігурацією. Точну назве інженер.');
+        return row[lower];
+      }
+    }
+
+    var steel = CONFIG.PRICE.steel;
+    warnings.push('Для цього поєднання матеріалу й товщини ціни в таблиці немає — ' +
+                  'показана за чорною сталлю. Точну назве інженер.');
+    return steel[thickness] || steel.t20 || steel.t8;
+  }
+
   function compute(input) {
     var warnings = [];
 
-    var power = (CONFIG.POWER[input.material] || CONFIG.POWER.steel)[input.thickness] || 3;
-    if (CONFIG.POWER_BUMP_HOURS.indexOf(input.hours) !== -1) power = stepUp(power);
+    var powerRow = CONFIG.POWER[input.material] || CONFIG.POWER.steel;
+    var power = powerRow[input.thickness] || 3;
+    var price = lookupPrice(input.material, input.thickness, warnings);
 
-    var price = CONFIG.MACHINE_PRICE[power] || CONFIG.MACHINE_PRICE[3];
+    var speedRow = CONFIG.SPEED[input.material] || {};
+    var speed = speedRow[input.thickness] || null;
+
     var hoursPerDay = CONFIG.HOURS_MID[input.hours] || 6;
     var op = CONFIG.OPERATING;
     var hoursPerMonth = hoursPerDay * op.workDaysPerMonth;
@@ -118,7 +148,7 @@
     var currentSpend = input.spend;
     if (!currentSpend && input.metres) {
       currentSpend = input.metres * CONFIG.OUTSOURCE_RATE;
-      warnings.push('Поточні витрати оцінені з метрів різу за середньою ціною ' +
+      warnings.push('Поточні витрати оцінені з метрів різу за ціною ' +
                     CONFIG.OUTSOURCE_RATE + ' грн/м.');
     }
 
@@ -126,14 +156,15 @@
     var payback = savings > 0 ? price / savings : null;
 
     if (payback === null) {
-      warnings.push('За вказаними витратами верстат поки не окупається: своя різка ' +
-                    'обійдеться дорожче, ніж ви витрачаєте зараз. Це нормально для ' +
-                    'малих обсягів — інженер підбере менш потужну модель або порахує ' +
-                    'сценарій з дозавантаженням сторонніми замовленнями.');
+      warnings.push('За вказаними витратами верстат поки не окупається: власна різка ' +
+                    'обійдеться дорожче, ніж ви витрачаєте зараз. Для таких обсягів ' +
+                    'інженер порахує сценарій з дозавантаженням сторонніми замовленнями ' +
+                    'або запропонує менш потужну конфігурацію.');
     }
 
     return {
       power: power,
+      speed: speed,
       model: MODEL_LABEL[power] || ('верстат ' + power + ' кВт'),
       price: price,
       monthlyOperating: monthlyOperating,
