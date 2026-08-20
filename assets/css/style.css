@@ -293,7 +293,7 @@ h3 { font-size: clamp(20px, 2.4vw, 26px); line-height: 1.2; }
 /* --- Hero ----------------------------------------------------------------- */
 .hero {
   position: relative;
-  padding-top: calc(var(--header-h) + clamp(56px, 8vw, 104px));
+  padding-top: calc(var(--header-h) + clamp(40px, 5vw, 68px));
   padding-bottom: clamp(56px, 7vw, 96px);
   overflow: hidden;
 }
@@ -320,20 +320,13 @@ h3 { font-size: clamp(20px, 2.4vw, 26px); line-height: 1.2; }
   -webkit-mask-image: radial-gradient(72% 62% at 50% 32%, #000 25%, transparent 78%);
 }
 
-.hero__inner {
-  display: grid;
-  grid-template-columns: minmax(0, 1.06fr) minmax(0, .94fr);
-  gap: clamp(32px, 5vw, 68px);
-  align-items: center;
-}
-
 .hero h1 {
-  font-size: clamp(36px, 5.4vw, 68px);
+  font-size: clamp(34px, 4.4vw, 58px);
   letter-spacing: -.03em;
 }
 
 .hero__sub {
-  margin-top: 24px;
+  margin-top: 18px;
   font-size: clamp(15px, 1.7vw, 18px);
   color: var(--muted);
   max-width: 54ch;
@@ -343,7 +336,7 @@ h3 { font-size: clamp(20px, 2.4vw, 26px); line-height: 1.2; }
   display: flex;
   flex-wrap: wrap;
   gap: 14px;
-  margin-top: 36px;
+  margin-top: 28px;
 }
 
 .hero__note {
@@ -370,46 +363,6 @@ h3 { font-size: clamp(20px, 2.4vw, 26px); line-height: 1.2; }
 }
 
 /* Hero visual */
-.hero__visual { position: relative; }
-
-.hero__panel {
-  position: relative;
-  aspect-ratio: 4 / 3.4;
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--line);
-  background:
-    radial-gradient(120% 90% at 50% 118%, rgba(0, 117, 255, .34), transparent 58%),
-    linear-gradient(150deg, #17181c, #0a0a0c 62%);
-  overflow: hidden;
-  box-shadow: var(--shadow);
-}
-
-.hero__badge {
-  position: absolute;
-  left: 24px;
-  bottom: 24px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px 16px;
-  border-radius: 14px;
-  background: rgba(10, 10, 12, .78);
-  border: 1px solid var(--line);
-  backdrop-filter: blur(10px);
-}
-
-.hero__badge b { display: block; font-size: 18px; line-height: 1.1; }
-.hero__badge small { color: var(--muted-2); font-size: 12px; }
-
-.hero__badge-icon {
-  width: 34px;
-  height: 34px;
-  border-radius: 10px;
-  background: rgba(0, 117, 255, .18);
-  display: grid;
-  place-items: center;
-  color: var(--accent);
-}
 
 /* --- Metrics -------------------------------------------------------------- */
 .metrics {
@@ -1083,8 +1036,8 @@ h3 { font-size: clamp(20px, 2.4vw, 26px); line-height: 1.2; }
 
 /* --- Responsive ----------------------------------------------------------- */
 @media (max-width: 1080px) {
-  .hero__inner { grid-template-columns: 1fr; }
-  .hero__visual { max-width: 560px; }
+  
+  
   .cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .why { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .industries { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -1848,27 +1801,54 @@ a.thanks__card:hover { transform: translateY(-5px); border-color: var(--accent);
 }
 
 /* --- Перший екран ---------------------------------------------------------- */
-.hero__panel--photo {
-  background: linear-gradient(160deg, #ffffff 0%, #e9ecf1 100%);
-  padding: 26px;
-  display: grid;
-  place-items: center;
-}
-
-.hero__panel--photo img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  mix-blend-mode: multiply;
-}
 
 /* бейдж поверх світлого фото лишається темним — контраст зберігається */
-.hero__panel--photo .hero__badge {
-  background: rgba(6, 6, 8, .88);
-  border-color: rgba(255, 255, 255, .16);
-}
 
 @media (max-width: 640px) {
   .product__media--photo,
-  .hero__panel--photo { padding: 14px; }
+  
+}
+
+/* ==========================================================================
+   ПЕРШИЙ ЕКРАН З ЛІНІЙКОЮ ОБЛАДНАННЯ
+   --------------------------------------------------------------------------
+   lineup.png має прозоре тло (62% пікселів повністю прозорі), тому знімок
+   кладеться прямо на темний фон — без світлої картки, яка потрібна каталожним
+   рендерам на білому. Пропорція 2,3:1, тож він іде на всю ширину під текстом,
+   а не у вузькій колонці збоку.
+   ========================================================================== */
+
+.hero--lineup { padding-bottom: clamp(32px, 4vw, 56px); }
+
+.hero__copy { max-width: 940px; }
+
+.hero--lineup h1 { max-width: 18ch; }
+
+.hero__lineup {
+  margin-top: clamp(20px, 2.5vw, 36px);
+  position: relative;
+}
+
+/* мʼяке світіння під технікою, щоб вона не «висіла» в порожнечі */
+.hero__lineup::after {
+  content: '';
+  position: absolute;
+  left: 8%;
+  right: 8%;
+  bottom: 2%;
+  height: 14%;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at center, rgba(0, 117, 255, .30), transparent 70%);
+  filter: blur(26px);
+  z-index: -1;
+}
+
+.hero__lineup img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+@media (max-width: 900px) {
+  .hero--lineup h1 { max-width: none; }
 }
