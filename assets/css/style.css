@@ -1368,6 +1368,59 @@ h3 { font-size: clamp(20px, 2.4vw, 26px); line-height: 1.2; }
   color: var(--muted-2);
 }
 
+/* --- Виділений кейс з цифрами --------------------------------------------- */
+.case--featured {
+  border-color: rgba(0, 117, 255, .32);
+  background:
+    radial-gradient(70% 120% at 100% 0%, rgba(0, 117, 255, .12), transparent 60%),
+    var(--panel);
+  padding: clamp(24px, 3vw, 38px);
+}
+
+.case--featured h3 { font-size: clamp(20px, 2.4vw, 26px); }
+
+.case__figures {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  margin-bottom: 26px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid var(--line-soft);
+}
+
+.case__figures b {
+  display: block;
+  font-size: clamp(20px, 2.6vw, 30px);
+  font-weight: 700;
+  letter-spacing: -.02em;
+  line-height: 1.1;
+  color: var(--highlight);
+}
+
+.case__figures span {
+  display: block;
+  margin-top: 8px;
+  font-size: 13px;
+  color: var(--muted-2);
+}
+
+.case--featured dl { gap: 18px; }
+.case--featured dd { font-size: 15px; }
+
+/* Показники розрахункові, а не звірені з клієнтом — це має бути видно */
+.case__note { display: block; margin-top: 6px; font-style: italic; }
+
+.cases__subhead {
+  margin: clamp(32px, 4vw, 48px) 0 20px;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+@media (max-width: 640px) {
+  .case__figures { grid-template-columns: 1fr; gap: 14px; }
+}
+
 /* --- Комплект (Б-7) ------------------------------------------------------- */
 .kit {
   display: grid;
