@@ -53,9 +53,19 @@
       powerFactor: 2.2,
       tariffKwh: 11,          /* грн за кВт·год, тариф для підприємств 2026 */
       workDaysPerMonth: 22,
-      gasPerHour: 70,         /* середнє по повітрю / кисню / азоту */
+      gasPerHour: 70,         /* запасне значення, якщо газ не обрано */
       consumablesPerHour: 25, /* лінзи, сопла, кераміка; ресурс ≈ 800 год */
       operatorSalary: 35000   /* середина діапазону 30 000–40 000 грн */
+    },
+
+    /* Робочий газ, грн за годину різки (бриф 4.2).
+       Розкид величезний — від стисненого повітря до азоту різниця понад 10x,
+       тому газ винесено в окреме поле форми, а не усереднено. */
+    GAS: {
+      air:     { label: 'Стиснене повітря', min: 5,   max: 20,  mid: 12 },
+      oxygen:  { label: 'Кисень',           min: 25,  max: 70,  mid: 48 },
+      nitrogen:{ label: 'Азот',             min: 120, max: 300, mid: 210 },
+      unknown: { label: 'Ще не визначився', min: 70,  max: 70,  mid: 70 }
     },
 
     /* Якщо вказано метри різу замість витрат — оцінюємо поточні витрати */
@@ -75,7 +85,8 @@
     },
     material:  { steel: 'чорна сталь', inox: 'нержавійка', alu: 'алюміній', copper: 'мідь, латунь' },
     thickness: { t3: 'до 3 мм', t8: '3–8 мм', t20: '8–20 мм', t20p: 'понад 20 мм' },
-    hours:     { h4: 'до 4 год/добу', h8: '4–8 год/добу', h16: '8–16 год/добу', h16p: 'понад 16 год/добу' }
+    hours:     { h4: 'до 4 год/добу', h8: '4–8 год/добу', h16: '8–16 год/добу', h16p: 'понад 16 год/добу' },
+    gas:       { air: 'стиснене повітря', oxygen: 'кисень', nitrogen: 'азот', unknown: 'не визначено' }
   };
 
   var MODEL_LABEL = {
@@ -140,7 +151,8 @@
     var hoursPerMonth = hoursPerDay * op.workDaysPerMonth;
 
     var electricity = power * op.powerFactor * hoursPerMonth * op.tariffKwh;
-    var gas         = hoursPerMonth * op.gasPerHour;
+    var gasRow      = CONFIG.GAS[input.gas] || CONFIG.GAS.unknown;
+    var gas         = hoursPerMonth * gasRow.mid;
     var consumables = hoursPerMonth * op.consumablesPerHour;
     var monthlyOperating = electricity + gas + consumables + op.operatorSalary;
 
@@ -150,6 +162,13 @@
       currentSpend = input.metres * CONFIG.OUTSOURCE_RATE;
       warnings.push('Поточні витрати оцінені з метрів різу за ціною ' +
                     CONFIG.OUTSOURCE_RATE + ' грн/м.');
+    }
+
+    if (input.gas === 'unknown' || !input.gas) {
+      warnings.push('Робочий газ не обрано — узято середнє 70 грн/год. Реальна ' +
+                    'вартість залежить від технології: стиснене повітря 5–20, ' +
+                    'кисень 25–70, азот 120–300 грн/год. Це найбільше впливає на ' +
+                    'підсумок, тож уточніть газ для точного розрахунку.');
     }
 
     var savings = currentSpend - monthlyOperating;
@@ -165,6 +184,8 @@
     return {
       power: power,
       speed: speed,
+      gas: gasRow.label,
+      gasCost: gas,
       model: MODEL_LABEL[power] || ('верстат ' + power + ' кВт'),
       price: price,
       monthlyOperating: monthlyOperating,
@@ -211,6 +232,7 @@
       metres:    metres,
       material:  form.querySelector('[name="material"]').value,
       thickness: form.querySelector('[name="thickness"]').value,
+      gas:       form.querySelector('[name="gas"]').value,
       hours:     form.querySelector('[name="hours"]').value
     };
 
@@ -273,6 +295,7 @@
         'матеріал: ' + (LABEL.material[i.material] || i.material),
         'товщина: ' + (LABEL.thickness[i.thickness] || i.thickness),
         'завантаження: ' + (LABEL.hours[i.hours] || i.hours),
+        'робочий газ: ' + (LABEL.gas[i.gas] || 'не вказано'),
         'поточні витрати: ' + Math.round(r.currentSpend) + ' грн/міс',
         'рекомендація: ' + r.model,
         'ціна: ' + Math.round(r.price) + ' грн',
