@@ -155,17 +155,6 @@ h3 { font-size: clamp(20px, 2.4vw, 26px); line-height: 1.2; }
 .btn--sm { padding: 11px 20px; font-size: 14px; }
 .btn--block { width: 100%; }
 
-.link-arrow {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  font-weight: 600;
-  color: var(--accent);
-  transition: gap .25s var(--ease), color .25s var(--ease);
-}
-
-.link-arrow:hover { gap: 16px; color: var(--white); }
-
 /* --- Header --------------------------------------------------------------- */
 .header {
   position: fixed;
@@ -1420,8 +1409,6 @@ h3 { font-size: clamp(20px, 2.4vw, 26px); line-height: 1.2; }
 }
 
 .kit__col li:last-child { border-bottom: 0; padding-bottom: 0; }
-.kit__price { flex: 0 0 auto; }
-.kit__todo { display: block; }
 
 .kit__foot {
   margin-top: 20px;

@@ -349,13 +349,6 @@
     });
   });
 
-  /* Посилання, які ще нікуди не ведуть (каталог моделей) */
-  $$('[data-todo-link]').forEach(function (link) {
-    link.addEventListener('click', function (e) {
-      e.preventDefault();
-      console.warn('[todo] Не задано адресу каталогу моделей для:', link.textContent.trim());
-    });
-  });
 
   $('#year').textContent = new Date().getFullYear();
 })();
