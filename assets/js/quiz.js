@@ -1,86 +1,67 @@
 /* ==========================================================================
-   Б-3. Квіз-підбір верстата — 7 кроків
+   Б-3. Квіз-підбір обладнання — 2 питання + контакт
    --------------------------------------------------------------------------
-   Перші шість кроків корисні для клієнта, контакт — останнім, разом із уже
-   готовим підбором. Усі відповіді йдуть у заявку (payload.quiz), щоб CRM
-   бачила сегмент, а не тільки телефон.
+   Скорочений сценарій: мета використання й бюджет. Підбір робиться за
+   бюджетною вилкою (ціни — з каталогу, розділ 1.1 брифу), а мета використання
+   уточнює формулювання й пріоритет у КП.
 
-   Відповідь «Збираю інформацію» на кроці 5 позначає ліда холодним:
-   payload.lead_temperature = 'cold', payload.do_not_call = true.
+   Контакт запитується останнім, коли вже є що показати.
+   Усі відповіді йдуть у заявку разом із контактом.
    ========================================================================== */
 (function () {
   'use strict';
 
   var STEPS = [
     {
-      key: 'task',
-      title: 'Яке завдання потрібно вирішити?',
+      key: 'purpose',
+      type: 'options',
+      title: 'Для яких цілей вам потрібне обладнання?',
       options: [
-        { value: 'cut-sheet',  label: 'Різка листа' },
-        { value: 'cut-tube',   label: 'Різка труби і профілю' },
-        { value: 'weld',       label: 'Зварювання' },
-        { value: 'clean',      label: 'Очищення від іржі й фарби' },
-        { value: 'mark',       label: 'Маркування та гравіювання' },
-        { value: 'unsure',     label: 'Ще не визначився' }
+        { value: 'home',       label: 'Для домашнього використання' },
+        { value: 'production', label: 'Для виробництва' },
+        { value: 'business',   label: 'Для бізнесу' }
       ]
     },
     {
-      key: 'material',
-      title: 'З яким матеріалом працюєте?',
+      key: 'budget',
+      type: 'slider',
+      title: 'Підкажіть ваш бюджет',
+      hint: 'Пересуньте повзунок — покажемо, що входить у цю вилку.',
       options: [
-        { value: 'steel',  label: 'Чорна сталь' },
-        { value: 'inox',   label: 'Нержавійка' },
-        { value: 'alu',    label: 'Алюміній' },
-        { value: 'copper', label: 'Мідь, латунь' },
-        { value: 'mixed',  label: 'Кілька матеріалів' }
-      ]
-    },
-    {
-      key: 'thickness',
-      title: 'Яка товщина?',
-      hint: 'Головний фільтр — від нього залежить потужність і ціна.',
-      options: [
-        { value: 't3',   label: 'до 3 мм' },
-        { value: 't8',   label: '3–8 мм' },
-        { value: 't20',  label: '8–20 мм' },
-        { value: 't20p', label: 'понад 20 мм' }
-      ]
-    },
-    {
-      key: 'volume',
-      title: 'Який обсяг роботи?',
-      options: [
-        { value: 'onetime', label: 'Разові вироби' },
-        { value: 'h8',      label: 'до 8 годин на добу' },
-        { value: 'h16',     label: 'Змінна робота, 16+ годин' },
-        { value: 'serial',  label: 'Серійне виробництво' }
-      ]
-    },
-    {
-      key: 'when',
-      title: 'Коли плануєте запуск?',
-      options: [
-        { value: 'now',   label: 'Цього місяця' },
-        { value: 'm1_3',  label: 'За 1–3 місяці' },
-        { value: 'm3_6',  label: 'За 3–6 місяців' },
-        { value: 'info',  label: 'Збираю інформацію' }
-      ]
-    },
-    {
-      key: 'payment',
-      title: 'Як плануєте оплату?',
-      options: [
-        { value: 'own',     label: 'Власні кошти' },
-        { value: 'grant',   label: 'Грант чи держпрограма' },
-        { value: 'leasing', label: 'Лізинг, кредит' },
-        { value: 'consult', label: 'Потрібна консультація' }
+        { value: 'b1', label: 'Менше 300 000 грн',                 short: 'до 300 тис.' },
+        { value: 'b2', label: 'Від 300 000 грн до 1 000 000 грн',  short: '300 тис. – 1 млн' },
+        { value: 'b3', label: 'Від 1 000 000 грн',                 short: 'від 1 млн' }
       ]
     }
   ];
 
   var TOTAL = STEPS.length + 1; /* +1 — крок контакту */
 
-  var quiz      = document.getElementById('quiz');
+  /* Підбір за бюджетом. Ціни — з каталогу сайту. */
+  var BUDGET_PICKS = {
+    b1: [
+      { name: 'Лазерний маркер і гравер', spec: '20–50 Вт, настільне виконання', price: 'від 109 000 грн' },
+      { name: 'Зварювальний апарат 4 в 1, 1,5 кВт', spec: 'Raycus · 1,5 кВт · 220 В', price: '295 403 грн' }
+    ],
+    b2: [
+      { name: 'Зварювальний апарат 4 в 1, 2 кВт', spec: 'Maxphotonics · подвійна подача дроту', price: '416 249 грн' },
+      { name: 'Зварювальний апарат 4 в 1, 3 кВт', spec: 'Maxphotonics · водяне охолодження', price: '581 853 грн' },
+      { name: 'Апарат лазерного очищення', spec: '200 Вт – 3 кВт · мобільне виконання', price: 'від 415 000 грн' }
+    ],
+    b3: [
+      { name: 'TSK Laser H1530, 1,5 кВт', spec: 'поле 1500 × 3000 мм · чорна сталь до 3 мм', price: 'від 1 284 008 грн' },
+      { name: 'TSK Laser H1530, 3 кВт',   spec: 'поле 1500 × 3000 мм · чорна сталь 3–8 мм',  price: 'від 1 449 977 грн' },
+      { name: 'TSK Laser H1530, 6 кВт',   spec: 'поле 1500 × 3000 мм · чорна сталь 8–20 мм', price: 'від 2 801 309 грн' }
+    ]
+  };
+
+  var PURPOSE_NOTE = {
+    home:       'Для домашньої майстерні дивимось на компактні моделі з живленням 220 В.',
+    production: 'Для виробництва враховуємо ресурс і роботу в зміну — охолодження та запас потужності.',
+    business:   'Під бізнес-задачі рахуємо окупність: собівартість деталі й строк повернення інвестиції.'
+  };
+
+  var quiz = document.getElementById('quiz');
   if (!quiz) return;
 
   var stepLabel = document.getElementById('quizStep');
@@ -94,85 +75,72 @@
   var answers = {};
   var index   = 0;
 
+  function labelOf(step, value) {
+    for (var i = 0; i < step.options.length; i++) {
+      if (step.options[i].value === value) return step.options[i].label;
+    }
+    return value;
+  }
+
   /* ------------------------------------------------------------ підбір ---- */
-  /* Використовує таблицю з calc.js, якщо вона доступна. */
   function recommend() {
-    var thickness = answers.thickness || 't8';
-    var material  = answers.material === 'mixed' ? 'inox' : (answers.material || 'steel');
-
-    var base = 3;
-    if (window.NL_CALC) {
-      var hoursMap = { onetime: 'h4', h8: 'h8', h16: 'h16', serial: 'h16p' };
-      var r = window.NL_CALC.compute({
-        material: material,
-        thickness: thickness,
-        hours: hoursMap[answers.volume] || 'h8',
-        spend: 0,
-        metres: 0
-      });
-      base = r.power;
-    }
-
-    var TASK_FAMILY = {
-      'cut-sheet': 'різка листа',
-      'cut-tube':  'різка труби і профілю',
-      'weld':      'зварювання',
-      'clean':     'очищення металу',
-      'mark':      'маркування',
-      'unsure':    'універсальне рішення'
-    };
-
-    var family = TASK_FAMILY[answers.task] || 'різка металу';
-
-    /* Зварювання й очищення — інший модельний ряд, менші потужності */
-    if (answers.task === 'weld') {
-      return [
-        { name: 'Зварювальний апарат 1,5 кВт 4 в 1 Raycus', spec: '1,5 кВт · 220 В', price: '295 403 грн',
-          why: 'Базова модель під ' + family + ' до 3 мм. Одразу вміє різати, чистити й зачищати шов.' },
-        { name: 'Зварювальний апарат 2 кВт 4 в 1 Maxphotonics', spec: '2 кВт · подвійна подача дроту', price: '416 249 грн',
-          why: 'Якщо є товщини до 6 мм або потрібен ширший діапазон дроту.' },
-        { name: 'Зварювальний апарат 3 кВт 4 в 1 Maxphotonics', spec: '3 кВт · водяне охолодження', price: '581 853 грн',
-          why: 'Для змінної роботи: водяне охолодження тримає режим цілу зміну.' }
-      ];
-    }
-
-    if (answers.task === 'clean' || answers.task === 'mark') {
-      return [
-        { name: answers.task === 'mark' ? 'Маркер 30 Вт (Fiber)' : 'Очищувач 200 Вт',
-          spec: 'мобільне виконання', price: '[ЦІНА]',
-          why: 'Стартова конфігурація під ' + family + '. Точну модель і ціну підтвердить інженер.' },
-        { name: answers.task === 'mark' ? 'Маркер 50 Вт (Fiber)' : 'Очищувач 1 кВт',
-          spec: 'стаціонарне виконання', price: '[ЦІНА]',
-          why: 'Якщо потрібна вища швидкість і робота у дві зміни.' }
-      ];
-    }
-
-    var next = base >= 6 ? 6 : (base === 4 ? 6 : (base === 3 ? 4 : 3));
-
-    return [
-      { name: 'Оптоволоконна різка ' + String(base).replace('.', ',') + ' кВт',
-        spec: 'під вашу товщину', price: '[ЦІНА]',
-        why: 'Розрахована саме під ' + family + ' і вашу товщину при заявленому завантаженні.' },
-      { name: 'Оптоволоконна різка ' + String(next).replace('.', ',') + ' кВт',
-        spec: 'із запасом', price: '[ЦІНА]',
-        why: 'Варіант із запасом: швидше на ваших товщинах і залишає місце для зростання обсягу.' }
-    ];
+    return BUDGET_PICKS[answers.budget] || BUDGET_PICKS.b2;
   }
 
   function renderResult() {
     var models = recommend();
-    var html = '<p class="quiz__result-head">За вашими відповідями підходить:</p><div class="quiz__models">';
+    var note = PURPOSE_NOTE[answers.purpose] || '';
+
+    var html = '<p class="quiz__result-head">За вашою вилкою бюджету підходить:</p>' +
+               '<div class="quiz__models">';
     models.forEach(function (m) {
       html += '<div class="quiz__model">' +
                 '<b>' + m.name + '</b>' +
                 '<span class="quiz__model-spec">' + m.spec + '</span>' +
-                '<span class="quiz__model-price">' + m.price.replace('[ЦІНА]', '<span class="todo">[ЦІНА]</span>') + '</span>' +
-                '<span class="quiz__model-why">' + m.why + '</span>' +
+                '<span class="quiz__model-price">' + m.price + '</span>' +
               '</div>';
     });
-    html += '</div><p class="quiz__result-note">Надішлемо повне КП із цінами, строком поставки й розрахунком окупності.</p>';
+    html += '</div>';
+    if (note) html += '<p class="quiz__result-note">' + note + '</p>';
+    html += '<p class="quiz__result-note">Надішлемо КП з характеристиками, строком поставки ' +
+            'й розрахунком окупності під ваші обсяги.</p>';
+
     result.innerHTML = html;
     result.hidden = false;
+  }
+
+  /* ------------------------------------------------------- крок-повзунок -- */
+  function renderSlider(step) {
+    var picked = answers[step.key] || step.options[1].value;
+    var idx = 0;
+    step.options.forEach(function (o, i) { if (o.value === picked) idx = i; });
+
+    var ticks = step.options.map(function (o) {
+      return '<span>' + o.short + '</span>';
+    }).join('');
+
+    options.innerHTML =
+      (step.hint ? '<p class="quiz__hint">' + step.hint + '</p>' : '') +
+      '<div class="quiz__slider">' +
+        '<output class="quiz__slider-value" id="quizBudgetValue">' + step.options[idx].label + '</output>' +
+        '<input class="quiz__range" id="quizRange" type="range" min="0" max="' +
+          (step.options.length - 1) + '" step="1" value="' + idx + '" ' +
+          'aria-label="' + step.title + '">' +
+        '<div class="quiz__slider-ticks">' + ticks + '</div>' +
+      '</div>' +
+      '<button class="btn btn--amber btn--block quiz__next" type="button" data-quiz-next>Далі →</button>';
+
+    var range = document.getElementById('quizRange');
+    var value = document.getElementById('quizBudgetValue');
+
+    /* фіксуємо початкове значення, щоб «Далі» працювало без руху повзунка */
+    answers[step.key] = step.options[idx].value;
+
+    range.addEventListener('input', function () {
+      var i = Number(range.value);
+      value.textContent = step.options[i].label;
+      answers[step.key] = step.options[i].value;
+    });
   }
 
   /* ------------------------------------------------------------- рендер --- */
@@ -198,22 +166,29 @@
     result.hidden = true;
     options.hidden = false;
 
+    if (step.type === 'slider') { renderSlider(step); return; }
+
     var html = step.hint ? '<p class="quiz__hint">' + step.hint + '</p>' : '';
     step.options.forEach(function (opt) {
       var active = answers[step.key] === opt.value ? ' is-active' : '';
-      html += '<button class="quiz__option' + active + '" type="button" data-value="' + opt.value + '">' +
-                opt.label +
-              '</button>';
+      html += '<button class="quiz__option' + active + '" type="button" data-value="' +
+              opt.value + '">' + opt.label + '</button>';
     });
     options.innerHTML = html;
   }
 
   options.addEventListener('click', function (e) {
     var btn = e.target.closest('.quiz__option');
-    if (!btn) return;
-    answers[STEPS[index].key] = btn.getAttribute('data-value');
-    index++;
-    render();
+    if (btn) {
+      answers[STEPS[index].key] = btn.getAttribute('data-value');
+      index++;
+      render();
+      return;
+    }
+    if (e.target.closest('[data-quiz-next]')) {
+      index++;
+      render();
+    }
   });
 
   backBtn.addEventListener('click', function () {
@@ -236,13 +211,13 @@
     form: contact,
     reset: reset,
     getAnswers: function () { return Object.assign({}, answers); },
-    /* Мітки для CRM: холодний лід не дзвонити, віддати в email-ланцюжок */
+    /* Читабельні відповіді для CRM + що саме показали клієнту */
     getMeta: function () {
-      var cold = answers.when === 'info';
       return {
-        quiz: Object.assign({}, answers),
-        lead_temperature: cold ? 'cold' : 'warm',
-        do_not_call: cold,
+        quiz: {
+          purpose: labelOf(STEPS[0], answers.purpose),
+          budget:  labelOf(STEPS[1], answers.budget)
+        },
         recommended: recommend().map(function (m) { return m.name; }).join(' | ')
       };
     }
