@@ -1785,10 +1785,18 @@ a.thanks__card:hover { transform: translateY(-5px); border-color: var(--accent);
 /* прибрати синє світіння, розраховане на темну підкладку */
 .product__media--photo::before { display: none; }
 
+/* place-items: center у .product__media не розтягує елемент сітки, тому
+   height:100% давало зображенню квадрат замість висоти контейнера, і зайве
+   обрізалося через overflow:hidden. stretch + min-*:0 повертають контроль
+   object-fit: contain. */
+.product__media--photo { place-items: stretch; }
+
 .product__media--photo img {
   position: relative;
   width: 100%;
   height: 100%;
+  min-width: 0;
+  min-height: 0;
   object-fit: contain;
   mix-blend-mode: multiply; /* прибирає залишковий сірий кант навколо рендера */
 }
