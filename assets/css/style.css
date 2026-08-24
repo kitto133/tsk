@@ -453,6 +453,9 @@ h3 { font-size: clamp(20px, 2.4vw, 26px); line-height: 1.2; }
 
 .product__media {
   position: relative;
+  /* Елемент грід-сітки .product: без min-width: 0 він не звужується менше
+     за min-content зображення й розпирає сторінку на телефоні. */
+  min-width: 0;
   aspect-ratio: 4 / 3;
   border-radius: var(--radius);
   border: 1px solid var(--line);
@@ -1030,8 +1033,8 @@ h3 { font-size: clamp(20px, 2.4vw, 26px); line-height: 1.2; }
   .cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .why { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .industries { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .cta__inner { grid-template-columns: 1fr; }
-  .finance { grid-template-columns: 1fr; }
+  .cta__inner { grid-template-columns: minmax(0, 1fr); }
+  .finance { grid-template-columns: minmax(0, 1fr); }
   .footer__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
@@ -1041,17 +1044,25 @@ h3 { font-size: clamp(20px, 2.4vw, 26px); line-height: 1.2; }
   .burger { display: grid; }
   .nav { margin-left: auto; }
   .header__actions { margin-left: auto; }
-  .product { grid-template-columns: 1fr; }
+  .product { grid-template-columns: minmax(0, 1fr); }
   .product:nth-child(even) .product__media { order: 0; }
 }
 
 @media (max-width: 640px) {
   :root { --gutter: 18px; }
-  .metrics { grid-template-columns: 1fr; }
-  .cards { grid-template-columns: 1fr; }
-  .why { grid-template-columns: 1fr; }
-  .industries { grid-template-columns: 1fr; }
-  .footer__grid { grid-template-columns: 1fr; gap: 32px; }
+
+  /* .btn має white-space: nowrap — на вузьких екранах довгий підпис
+     не переносився й розпирав сторінку. */
+  .btn {
+    white-space: normal;
+    max-width: 100%;
+    padding-inline: 20px;
+  }
+  .metrics { grid-template-columns: minmax(0, 1fr); }
+  .cards { grid-template-columns: minmax(0, 1fr); }
+  .why { grid-template-columns: minmax(0, 1fr); }
+  .industries { grid-template-columns: minmax(0, 1fr); }
+  .footer__grid { grid-template-columns: minmax(0, 1fr); gap: 32px; }
   .hero__actions .btn { width: 100%; }
   .faq__q { padding: 18px; font-size: 16px; }
   .faq__a p { padding: 0 18px 20px; }
@@ -1080,7 +1091,7 @@ h3 { font-size: clamp(20px, 2.4vw, 26px); line-height: 1.2; }
 /* --- Обов’язкові поля ----------------------------------------------------- */
 .field label i { color: var(--highlight); font-style: normal; }
 
-.field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.field-row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 14px; }
 .field-row .field { margin-top: 16px; }
 
 .field input[type="file"] {
@@ -1179,9 +1190,22 @@ h3 { font-size: clamp(20px, 2.4vw, 26px); line-height: 1.2; }
 .badge--stock { background: rgba(47, 208, 122, .16); color: #7ee2ab; }
 .badge--order { background: rgba(241, 158, 29, .16); color: var(--highlight); }
 
+/* Текстова колонка картки — теж елемент грід-сітки .product */
+.product > div { min-width: 0; }
+
+/* Обгортка без власного оформлення: потрібна лише щоб таблиця моделей
+   скролилася всередині себе, а не розпирала картку на телефоні. */
+.table-wrap--flush {
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  min-width: 0;
+  margin-bottom: 22px;
+}
+
 .models {
   width: 100%;
-  margin-bottom: 22px;
+  min-width: 380px;
   border-collapse: collapse;
   font-size: 14px;
 }
@@ -1302,7 +1326,7 @@ h3 { font-size: clamp(20px, 2.4vw, 26px); line-height: 1.2; }
 
 .calc__figures {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   gap: 14px;
   margin: 22px 0;
 }
@@ -1437,13 +1461,13 @@ h3 { font-size: clamp(20px, 2.4vw, 26px); line-height: 1.2; }
 }
 
 @media (max-width: 640px) {
-  .case__figures { grid-template-columns: 1fr; gap: 14px; }
+  .case__figures { grid-template-columns: minmax(0, 1fr); gap: 14px; }
 }
 
 /* --- Комплект (Б-7) ------------------------------------------------------- */
 .kit {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   gap: 20px;
 }
 
@@ -1927,21 +1951,21 @@ a.thanks__card:hover { transform: translateY(-5px); border-color: var(--accent);
 
 /* --- Адаптив нових блоків ------------------------------------------------- */
 @media (max-width: 1080px) {
-  .tri { grid-template-columns: 1fr; }
-  .calc { grid-template-columns: 1fr; }
-  .cases { grid-template-columns: 1fr; }
-  .cases--two { grid-template-columns: 1fr; }
-  .kit { grid-template-columns: 1fr; }
+  .tri { grid-template-columns: minmax(0, 1fr); }
+  .calc { grid-template-columns: minmax(0, 1fr); }
+  .cases { grid-template-columns: minmax(0, 1fr); }
+  .cases--two { grid-template-columns: minmax(0, 1fr); }
+  .kit { grid-template-columns: minmax(0, 1fr); }
   .industries--6 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .thanks__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
 @media (max-width: 640px) {
-  .field-row { grid-template-columns: 1fr; gap: 0; }
-  .trust-facts { grid-template-columns: 1fr; }
-  .industries--6 { grid-template-columns: 1fr; }
-  .thanks__grid { grid-template-columns: 1fr; }
-  .calc__figures { grid-template-columns: 1fr; }
+  .field-row { grid-template-columns: minmax(0, 1fr); gap: 0; }
+  .trust-facts { grid-template-columns: minmax(0, 1fr); }
+  .industries--6 { grid-template-columns: minmax(0, 1fr); }
+  .thanks__grid { grid-template-columns: minmax(0, 1fr); }
+  .calc__figures { grid-template-columns: minmax(0, 1fr); }
   .price { flex-direction: column; align-items: flex-start; }
   .badge { margin-left: 0; }
   .quiz__title { padding-right: 0; }
@@ -2077,7 +2101,18 @@ a.thanks__card:hover { transform: translateY(-5px); border-color: var(--accent);
 
 .kit-group h3 { font-size: 19px; margin-bottom: 16px; }
 
-.kit-group .table-wrap { background: transparent; border: 0; border-radius: 0; }
+/* Елемент грід-сітки за замовчуванням має min-width: auto й не звужується
+   менше за min-content вмісту. Через таблицю з min-width: 560px картка
+   розпирала сторінку на телефоні — звідси min-width: 0 на обох рівнях. */
+.kit-group { min-width: 0; }
+
+.kit-group .table-wrap {
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  min-width: 0;
+}
+
 .kit-group .spec-table { min-width: 560px; }
 .kit-group .spec-table td:last-child { white-space: nowrap; font-weight: 600; }
 
