@@ -1107,6 +1107,25 @@ h3 { font-size: clamp(20px, 2.4vw, 26px); line-height: 1.2; }
   color: var(--muted-2);
 }
 
+/* Збій надсилання: заявку не можна втратити мовчки, тому показуємо прямі
+   контакти замість переходу на сторінку подяки. */
+.form__fail {
+  margin-top: 14px;
+  padding: 13px 16px;
+  border-radius: var(--radius-sm);
+  background: rgba(253, 56, 16, .10);
+  border: 1px solid rgba(253, 56, 16, .42);
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: #ff9c85;
+}
+
+.form__fail a {
+  color: var(--white);
+  font-weight: 600;
+  text-decoration: underline;
+}
+
 .link-inline {
   color: var(--accent);
   font: inherit;

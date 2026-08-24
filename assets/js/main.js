@@ -15,7 +15,7 @@
      Поки порожньо, payload пишеться в консоль, а користувач усе одно
      потрапляє на сторінку подяки, щоб потік можна було протестувати.
      ------------------------------------------------------------------------ */
-  var ENDPOINT   = '';
+  var ENDPOINT   = 'https://hook.eu1.make.com/kv8aeve5ogk522lic7ah8teb496isbk4';
   var THANK_YOU  = 'thank-you.html';
 
   /* ------------------------------------------------------------ Шапка ----- */
@@ -275,6 +275,25 @@
     return payload;
   }
 
+  /* Повідомлення про невдале надсилання з прямими контактами — щоб людина
+     могла звʼязатися навіть тоді, коли інтеграція лежить. */
+  function showFailure(form) {
+    var box = $('.form__fail', form);
+    if (!box) {
+      box = document.createElement('p');
+      box.className = 'form__fail';
+      box.setAttribute('role', 'alert');
+      box.innerHTML =
+        'Не вдалося надіслати заявку — можливо, тимчасовий збій. ' +
+        'Напишіть або зателефонуйте, ми відповімо одразу:<br>' +
+        '<a href="tel:+380739333188">+38 073 933 31 88</a> · ' +
+        '<a href="https://t.me/tskassistant_bot" target="_blank" rel="noopener">Telegram</a>';
+      var button = $('button[type="submit"]', form);
+      button.parentNode.insertBefore(box, button.nextSibling);
+    }
+    box.hidden = false;
+  }
+
   function handle(form) {
     if (!form) return;
 
@@ -293,6 +312,15 @@
          конверсія. Персональні дані в URL не передаються. */
       var done = function () { location.href = THANK_YOU; };
 
+      /* Заявку не можна втратити мовчки: якщо надсилання не вдалося, лишаємо
+         людину на формі, показуємо прямі контакти й пишемо payload у консоль. */
+      var fail = function (reason) {
+        console.error('[form] заявку не надіслано:', reason, payload);
+        button.disabled = false;
+        button.textContent = label;
+        showFailure(form);
+      };
+
       if (!ENDPOINT) {
         console.info('[form] заявка готова до надсилання:', payload);
         setTimeout(done, 400);
@@ -304,13 +332,14 @@
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
       })
-        .then(done)
-        .catch(function (err) {
-          console.error('[form] не вдалося надіслати:', err);
-          button.disabled = false;
-          button.textContent = label;
-          alert('Не вдалося надіслати заявку. Зателефонуйте нам або напишіть у Telegram.');
-        });
+        .then(function (response) {
+          /* fetch не кидає помилку на 4xx/5xx — без цієї перевірки заявка
+             при вимкненому сценарії Make.com зникала б, а людина бачила б
+             сторінку подяки. */
+          if (!response.ok) throw new Error('HTTP ' + response.status);
+          done();
+        })
+        .catch(fail);
     });
 
     /* Знімати помилку, як тільки користувач почав виправляти поле */
