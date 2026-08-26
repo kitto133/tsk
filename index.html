@@ -58,7 +58,6 @@
   <a href="#thickness">Товщини й потужності</a>
   <a href="#calc">Калькулятор окупності</a>
   <a href="#cases">Кейси</a>
-  <a href="#grant">Грант і лізинг</a>
   <a href="#service">Сервіс</a>
   <a href="#faq">Питання</a>
   <a href="#contacts">Контакти</a>
@@ -238,7 +237,7 @@
           <div class="price">
             <span class="price__label">Ціна від</span>
             <span class="price__value">415 000 грн</span>
-            <span class="badge badge--order">під замовлення</span>
+            <span class="badge badge--stock">є на складі</span>
           </div>
 
           <div class="table-wrap table-wrap--flush">
@@ -509,9 +508,8 @@
         <span class="eyebrow">Кейси</span>
         <h2>Що змінилося у клієнтів</h2>
         <p class="lead">
-          Проєкт із цифрами — і типові конфігурації, які підбираємо під схожі
-          задачі в інших галузях. Порахувати окупність під ваші обсяги можна
-          <a href="#calc">в калькуляторі</a>.
+          Реальний проєкт із цифрами. Порахувати окупність під ваші обсяги
+          можна <a href="#calc">в калькуляторі</a>.
         </p>
       </div>
 
@@ -553,33 +551,6 @@
         </footer>
       </article>
 
-      <h3 class="cases__subhead reveal">Типові конфігурації під інші галузі</h3>
-
-      <div class="cases cases--two reveal">
-        <article class="case">
-          <h3>Вентиляційні системи та повітроводи</h3>
-          <dl>
-            <div><dt>Матеріал і товщина</dt><dd>Чорна й оцинкована сталь 0,8–3 мм</dd></div>
-            <div><dt>Конфігурація</dt><dd>TSK Laser H1530, джерело 3 кВт, робоче поле 1500 × 3000 мм</dd></div>
-            <div><dt>Чому саме вона</dt><dd>Потужність узята під швидку серійну порізку з запасом на пікові замовлення. Після лазера фланці й розгортки не потребують зачистки, як після плазми.</dd></div>
-          </dl>
-        </article>
-
-        <article class="case">
-          <h3>Сільгосптехніка та запчастини</h3>
-          <dl>
-            <div><dt>Матеріал і товщина</dt><dd>Чорна сталь 8–20 мм</dd></div>
-            <div><dt>Конфігурація</dt><dd>TSK Laser H1530, джерело 6 кВт, робоче поле 1500 × 3000 мм</dd></div>
-            <div><dt>Чому саме вона</dt><dd>Закриває точні кронштейни й корпусні деталі, зменшуючи частку плазмової різки та повторної обробки отворів.</dd></div>
-          </dl>
-        </article>
-      </div>
-
-      <p class="table-note">
-        Для вентиляції та сільгосптехніки показані конфігурації, а не кейси: у цих
-        галузях підприємство для публікації ще не визначено.
-        <span class="todo">[ПОТРІБНІ ДАНІ] Назва підприємства, місто й звірені цифри для кейсів 2 і 3.</span>
-      </p>
     </div>
   </section>
 
@@ -774,36 +745,6 @@
     </div>
   </section>
 
-  <!-- ==================== 9. ГРАНТ І ЛІЗИНГ (А-11) ==================== -->
-  <section class="section" id="grant">
-    <div class="shell">
-      <div class="finance reveal">
-        <div>
-          <span class="eyebrow">Фінансування</span>
-          <h2>Обладнання через грант: допоможемо оформити</h2>
-          <p class="lead">
-            Працюємо з <span class="todo">[ПОТРІБНІ ДАНІ — назви програм і банків]</span>.
-            Готуємо технічну частину заявки, специфікацію й розрахунок окупності — саме те,
-            через що заявки найчастіше відхиляють.
-            <span class="todo">[N]</span> наших клієнтів уже отримали обладнання за грантовими програмами.
-          </p>
-          <ul class="finance__list">
-            <li><b>1</b><span>Перевіряємо, під які програми ви підходите</span></li>
-            <li><b>2</b><span>Готуємо технічну частину заявки й специфікацію</span></li>
-            <li><b>3</b><span>Надаємо розрахунок окупності для обґрунтування</span></li>
-            <li><b>4</b><span>Супроводжуємо до отримання обладнання</span></li>
-          </ul>
-        </div>
-        <div>
-          <button class="btn btn--amber btn--block" type="button" data-modal-open
-                  data-modal-title="Перевіримо, чи підходите під грантову програму"
-                  data-modal-source="grant"
-                  data-modal-subject="Грант або лізинг">Перевірити, чи підходжу під грант</button>
-          <p class="form__micro" style="text-align:center">Консультація безкоштовна й займає близько 20 хвилин.</p>
-        </div>
-      </div>
-    </div>
-  </section>
 
   <!-- ==================== 10. ЧОМУ ОБИРАЮТЬ (А-8) ==================== -->
   <section class="section" id="why">
@@ -823,7 +764,7 @@
         <div class="why__item">
           <span class="why__num">02</span>
           <h3>Професійний підбір</h3>
-          <p>Підбором займається головний інженер — <span class="todo">[Ім’я, років у лазерній обробці]</span>. Не «найдешевше», а те, що витримає ваш обсяг.</p>
+          <p>Підбором займається головний інженер, а не менеджер із прайсом. Не «найдешевше», а те, що витримає ваш обсяг.</p>
         </div>
         <div class="why__item">
           <span class="why__num">03</span>
@@ -1027,26 +968,10 @@
 
         <article class="faq__item reveal">
           <button class="faq__q" type="button">
-            <span>Що є на складі просто зараз?</span>
-            <span class="faq__icon" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span>
-          </button>
-          <div class="faq__a"><div><p><span class="todo">[ПОТРІБНІ ДАНІ] Актуальний перелік моделей у наявності, оновлювати щотижня.</span> Зі складу відвантажуємо за 2–3 дні, під замовлення — <span class="todo">[N]</span> тижнів.</p></div></div>
-        </article>
-
-        <article class="faq__item reveal">
-          <button class="faq__q" type="button">
             <span>Чи можна зробити тестовий зразок з мого металу?</span>
             <span class="faq__icon" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span>
           </button>
           <div class="faq__a"><div><p>Так, безкоштовно. Надішліть креслення у DXF або фото деталі — виріжемо зразок на вашому матеріалі й надішлемо разом із розрахунком часу різки та собівартості деталі. Це найшвидший спосіб зрозуміти, чи підходить верстат. <a href="#sample">Надіслати креслення →</a></p></div></div>
-        </article>
-
-        <article class="faq__item reveal">
-          <button class="faq__q" type="button">
-            <span>Які умови лізингу й розстрочки?</span>
-            <span class="faq__icon" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span>
-          </button>
-          <div class="faq__a"><div><p><span class="todo">[ПОТРІБНІ ДАНІ] Банки-партнери, перший внесок, строк, ставка.</span> Працюємо з ФОП і ТОВ, з ПДВ і без. Допомагаємо з документами для грантових програм.</p></div></div>
         </article>
 
         <article class="faq__item reveal">
@@ -1225,7 +1150,6 @@
           <a href="#thickness">Товщини й потужності</a>
           <a href="#calc">Калькулятор окупності</a>
           <a href="#cases">Кейси</a>
-          <a href="#grant">Грант і лізинг</a>
           <a href="#service">Сервіс</a>
           <a href="#faq">Питання</a>
         </nav>
