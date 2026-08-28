@@ -185,7 +185,26 @@
   });
 
   /* --------------------------------------------------------- Валідація ---- */
-  var PHONE_RE = /^[+]?[\d\s().-]{9,20}$/;
+  /* ---------------------------------------------------------- Телефон ----
+     Український номер у канонічному вигляді: +380 і ще 9 цифр, перша з яких
+     3–9 (0, 1 і 2 після коду країни не використовуються). Це відсікає і
+     випадкові набори цифр, і надто довгі номери.
+
+     Приймаємо звичні способи запису — +380671234567, 380671234567,
+     0671234567, 671234567 — з будь-якими пробілами, дужками й дефісами,
+     а в CRM віддаємо один формат. */
+  var PHONE_UA = /^\+380[3-9]\d{8}$/;
+
+  function normalizePhone(raw) {
+    var digits = String(raw || '').replace(/\D/g, '');
+    var candidate =
+      digits.length === 12 && digits.slice(0, 3) === '380' ? '+' + digits :
+      digits.length === 11 && digits.slice(0, 2) === '80'  ? '+3' + digits :
+      digits.length === 10 && digits.charAt(0) === '0'     ? '+38' + digits :
+      digits.length === 9                                  ? '+380' + digits :
+      null;
+    return candidate && PHONE_UA.test(candidate) ? candidate : null;
+  }
   var EMAIL_RE = /^[^\s@]+@[^\s@]+\.[a-z]{2,}$/i;
   var MAX_FILE = 15 * 1024 * 1024;
   var FILE_OK  = ['dxf', 'dwg', 'pdf', 'jpg', 'jpeg', 'png'];
@@ -219,7 +238,7 @@
       if (!value) { fail(input); return; }
 
       if (input.name === 'name' && value.length < 2) { fail(input); return; }
-      if (input.type === 'tel' && !PHONE_RE.test(value)) { fail(input); return; }
+      if (input.type === 'tel' && !normalizePhone(value)) { fail(input); return; }
 
       setError(input, false);
     });
@@ -264,6 +283,12 @@
       }
       payload[key] = value;
     });
+
+    /* У CRM телефон іде в одному форматі +380XXXXXXXXX, як його не вводили */
+    if (payload.phone) {
+      var normalized = normalizePhone(payload.phone);
+      if (normalized) payload.phone = normalized;
+    }
 
     /* Відповіді квіза й мітки для CRM (Б-3) */
     if (form === (window.NL_QUIZ && window.NL_QUIZ.form) && window.NL_QUIZ) {
