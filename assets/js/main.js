@@ -205,6 +205,70 @@
       null;
     return candidate && PHONE_UA.test(candidate) ? candidate : null;
   }
+
+  /* ------------------------------------------------------- Маска номера --
+     Поле саме тримає формат +380 XX XXX XX XX. Зайві цифри не вводяться:
+     після коду країни лишається рівно 9 знаків, решта відкидається — і при
+     наборі, і при вставці з буфера. */
+
+  /* Абонентські цифри без коду країни, максимум 9.
+     Нуль відкидається окремо від коду країни, а не замість нього: людина
+     часто набирає 067… у полі, де +380 вже підставлено, і без цього кроку
+     нуль ставав би абонентською цифрою й зсував увесь номер. Українські
+     номери після коду країни починаються з 3–9, тому 0 тут завжди зайвий. */
+  function subscriberDigits(raw) {
+    var d = String(raw || '').replace(/\D/g, '');
+    if (d.indexOf('380') === 0)      d = d.slice(3);
+    else if (d.indexOf('80') === 0)  d = d.slice(2);
+    if (d.charAt(0) === '0')         d = d.slice(1);
+    return d.slice(0, 9);
+  }
+
+  function formatPhone(digits) {
+    var out = '+380';
+    if (digits.length)     out += ' ' + digits.slice(0, 2);
+    if (digits.length > 2) out += ' ' + digits.slice(2, 5);
+    if (digits.length > 5) out += ' ' + digits.slice(5, 7);
+    if (digits.length > 7) out += ' ' + digits.slice(7, 9);
+    return out;
+  }
+
+  function attachPhoneMask(input) {
+    var MAX_DIGITS = 12; /* 380 + 9 абонентських */
+
+    /* Під час набору не переписуємо значення у формат: якщо маска сама
+       вписує «+380», згодом неможливо відрізнити цей код від набраного
+       людиною, і номер 380671234567 перетворювався б на 380 380 671 234.
+       Тому тут лише не даємо ввести зайві цифри, а до канонічного вигляду
+       зводимо при виході з поля. */
+    input.addEventListener('input', function () {
+      var digits = input.value.replace(/\D/g, '');
+      if (digits.length <= MAX_DIGITS) return;
+
+      var kept = 0, out = '';
+      for (var i = 0; i < input.value.length; i++) {
+        var ch = input.value[i];
+        if (/\d/.test(ch)) {
+          if (kept >= MAX_DIGITS) continue;
+          kept++;
+        }
+        out += ch;
+      }
+      var pos = Math.min(input.selectionStart || out.length, out.length);
+      input.value = out;
+      try { input.setSelectionRange(pos, pos); } catch (e) { /* не текстове поле */ }
+    });
+
+    /* Приводимо до +380 XX XXX XX XX, коли номер уже введено повністю */
+    input.addEventListener('blur', function () {
+      var digits = subscriberDigits(input.value);
+      input.value = digits.length === 9 ? formatPhone(digits)
+                  : digits.length ? input.value.trim()
+                  : '';
+    });
+  }
+
+  $$('input[type="tel"]').forEach(attachPhoneMask);
   var EMAIL_RE = /^[^\s@]+@[^\s@]+\.[a-z]{2,}$/i;
   var MAX_FILE = 15 * 1024 * 1024;
   var FILE_OK  = ['dxf', 'dwg', 'pdf', 'jpg', 'jpeg', 'png'];
