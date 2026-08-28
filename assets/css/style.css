@@ -1895,7 +1895,6 @@ a.thanks__card:hover { transform: translateY(-5px); border-color: var(--accent);
 .thanks__card b { font-size: 16px; }
 .thanks__card span { font-size: 13.5px; color: var(--muted-2); }
 .thanks__card em { margin-top: auto; font-style: normal; }
-.thanks__card--video { border-style: dashed; border-color: rgba(241, 158, 29, .3); }
 
 .thanks__foot {
   display: flex;
