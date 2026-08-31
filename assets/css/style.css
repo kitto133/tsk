@@ -1091,6 +1091,54 @@ h3 { font-size: clamp(20px, 2.4vw, 26px); line-height: 1.2; }
 /* --- Обов’язкові поля ----------------------------------------------------- */
 .field label i { color: var(--highlight); font-style: normal; }
 
+/* --- Телефон: нередагований код країни ------------------------------------
+   +380 винесено з інпута окремим елементом. Поки код був усередині значення,
+   його неможливо було відрізнити від набраного людиною: набір 0671234567
+   у полі з підставленим кодом перетворювався на +380 06 712 34 56.
+   Тепер в інпуті лишаються тільки 9 абонентських цифр — плутанина зникає
+   за побудовою, а обгортка виглядає як єдине поле.
+   -------------------------------------------------------------------------- */
+.field__phone {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 16px;
+  background: rgba(255, 255, 255, .04);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  transition: border-color .22s var(--ease), background-color .22s var(--ease);
+}
+
+.field__phone:focus-within {
+  border-color: var(--accent);
+  background: rgba(0, 117, 255, .07);
+}
+
+.field.has-error .field__phone { border-color: #fd3810; }
+
+.field__phone-code {
+  flex: 0 0 auto;
+  font-size: 15px;
+  color: var(--muted);
+  user-select: none;
+}
+
+/* інпут усередині обгортки не має власної рамки — рамку малює обгортка */
+.field__phone input[type="tel"] {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
+}
+
+.field__phone input[type="tel"]:focus {
+  outline: none;
+  border: 0;
+  background: none;
+}
+
 .field-row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 14px; }
 .field-row .field { margin-top: 16px; }
 

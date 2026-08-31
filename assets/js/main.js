@@ -224,47 +224,51 @@
     return d.slice(0, 9);
   }
 
-  function formatPhone(digits) {
-    var out = '+380';
-    if (digits.length)     out += ' ' + digits.slice(0, 2);
-    if (digits.length > 2) out += ' ' + digits.slice(2, 5);
-    if (digits.length > 5) out += ' ' + digits.slice(5, 7);
-    if (digits.length > 7) out += ' ' + digits.slice(7, 9);
+  /* Абонентська частина у вигляді XX XXX XX XX — код країни живе поруч,
+     окремим елементом розмітки, і в значення поля не потрапляє. */
+  function formatSubscriber(d) {
+    var out = d.slice(0, 2);
+    if (d.length > 2) out += ' ' + d.slice(2, 5);
+    if (d.length > 5) out += ' ' + d.slice(5, 7);
+    if (d.length > 7) out += ' ' + d.slice(7, 9);
     return out;
   }
 
+  /* Що саме людина ввела в поле. Просто набрані 9 цифр беремо як є, а от
+     вставку або автозаповнення повного номера (+380…, 0…) чистимо від коду
+     країни й трунк-нуля. */
+  function fieldSubscriber(value) {
+    var d = String(value || '').replace(/\D/g, '');
+    var looksFull = String(value).indexOf('+') !== -1 || d.charAt(0) === '0' || d.length > 9;
+    return looksFull ? subscriberDigits(value) : d.slice(0, 9);
+  }
+
   function attachPhoneMask(input) {
-    var MAX_DIGITS = 12; /* 380 + 9 абонентських */
-
-    /* Під час набору не переписуємо значення у формат: якщо маска сама
-       вписує «+380», згодом неможливо відрізнити цей код від набраного
-       людиною, і номер 380671234567 перетворювався б на 380 380 671 234.
-       Тому тут лише не даємо ввести зайві цифри, а до канонічного вигляду
-       зводимо при виході з поля. */
-    input.addEventListener('input', function () {
-      var digits = input.value.replace(/\D/g, '');
-      if (digits.length <= MAX_DIGITS) return;
-
-      var kept = 0, out = '';
-      for (var i = 0; i < input.value.length; i++) {
-        var ch = input.value[i];
-        if (/\d/.test(ch)) {
-          if (kept >= MAX_DIGITS) continue;
-          kept++;
-        }
-        out += ch;
+    function caretAfterNthDigit(value, nth) {
+      if (nth <= 0) return 0;
+      var seen = 0;
+      for (var i = 0; i < value.length; i++) {
+        if (/\d/.test(value[i]) && ++seen === nth) return i + 1;
       }
-      var pos = Math.min(input.selectionStart || out.length, out.length);
-      input.value = out;
+      return value.length;
+    }
+
+    /* Форматуємо просто під час набору: коду країни в значенні немає,
+       тому неоднозначності, через яку це не працювало раніше, теж немає. */
+    input.addEventListener('input', function () {
+      var caret = input.selectionStart || 0;
+      var digitsBefore = input.value.slice(0, caret).replace(/\D/g, '').length;
+
+      var formatted = formatSubscriber(fieldSubscriber(input.value));
+      if (formatted === input.value) return;
+
+      input.value = formatted;
+      var pos = caretAfterNthDigit(formatted, digitsBefore);
       try { input.setSelectionRange(pos, pos); } catch (e) { /* не текстове поле */ }
     });
 
-    /* Приводимо до +380 XX XXX XX XX, коли номер уже введено повністю */
     input.addEventListener('blur', function () {
-      var digits = subscriberDigits(input.value);
-      input.value = digits.length === 9 ? formatPhone(digits)
-                  : digits.length ? input.value.trim()
-                  : '';
+      input.value = formatSubscriber(fieldSubscriber(input.value));
     });
   }
 
