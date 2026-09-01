@@ -1073,26 +1073,6 @@ h3 { font-size: clamp(20px, 2.4vw, 26px); line-height: 1.2; }
    БЛОКИ, ДОДАНІ ЗА ТЗ (розділи А, Б, В)
    ========================================================================== */
 
-/* --- Маркер незаповнених даних -------------------------------------------- */
-/* Усе, що позначено .todo, треба замінити реальними даними до запуску.
-   Знайти все одразу: grep -rn "class=\"todo\"" *.html                        */
-/* На живому сайті маркери приховані — відвідувач не має бачити службових
-   позначок. Щоб перевірити, чого ще бракує, відкрийте будь-яку сторінку
-   з ?draft=1 у кінці адреси (на localhost вони видно завжди). */
-.todo { display: none; }
-
-.is-draft .todo {
-  display: inline;
-  padding: 1px 7px;
-  border-radius: 5px;
-  background: rgba(241, 158, 29, .14);
-  border: 1px dashed rgba(241, 158, 29, .55);
-  color: var(--highlight);
-  font-size: .92em;
-  font-weight: 500;
-  white-space: normal;
-}
-
 /* --- Обов’язкові поля ----------------------------------------------------- */
 .field label i { color: var(--highlight); font-style: normal; }
 
@@ -1304,7 +1284,6 @@ h3 { font-size: clamp(20px, 2.4vw, 26px); line-height: 1.2; }
 
 .models td:last-child { font-weight: 600; white-space: nowrap; }
 .models tbody tr:hover { background: rgba(255, 255, 255, .03); }
-.models__todo { color: var(--muted-2); }
 
 /* --- Три тези (А-6) ------------------------------------------------------- */
 .tri {
@@ -1984,17 +1963,6 @@ a.thanks__card:hover { transform: translateY(-5px); border-color: var(--accent);
 /* --- Юридична сторінка ---------------------------------------------------- */
 .legal { padding: calc(var(--header-h) + 48px) 0 clamp(56px, 7vw, 90px); }
 .legal .shell { max-width: 820px; }
-
-.legal__warning {
-  padding: 18px 22px;
-  margin-bottom: 40px;
-  border-radius: var(--radius-sm);
-  background: rgba(241, 158, 29, .10);
-  border: 1px solid rgba(241, 158, 29, .4);
-  font-size: 14.5px;
-  line-height: 1.6;
-  color: #f3c274;
-}
 
 .legal h1 { font-size: clamp(28px, 4vw, 44px); }
 .legal__meta { margin-top: 12px; font-size: 14px; color: var(--muted-2); }
