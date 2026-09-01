@@ -11,11 +11,15 @@
 
   /* ------------------------------------------------------------------------
      НАЛАШТУВАННЯ ПРИЙОМУ ЗАЯВОК
-     Вкажіть адресу обробника — і форми почнуть надсилати JSON методом POST.
-     Поки порожньо, payload пишеться в консоль, а користувач усе одно
+     Адреса вебхука Make.com. Це єдине місце, де вона задається — міняти тут.
+     Якщо лишити порожнім, payload пишеться в консоль, а людина все одно
      потрапляє на сторінку подяки, щоб потік можна було протестувати.
+
+     ПІСЛЯ ХОСТИНГУ обовʼязково перевірте, що заявки доходять: відкрийте
+     сайт із ?leadtest=1 в адресі — угорі зʼявиться панель самоперевірки.
+     Вона надсилає позначену тестову заявку й показує відповідь сервера.
      ------------------------------------------------------------------------ */
-  var ENDPOINT   = 'https://hook.eu1.make.com/kv8aeve5ogk522lic7ah8teb496isbk4';
+  var ENDPOINT   = 'https://hook.eu2.make.com/n6fbfan75izqsayuyg4p73bsvdkwixln';
   var THANK_YOU  = 'thank-you.html';
 
   /* ------------------------------------------------------------ Шапка ----- */
@@ -480,4 +484,87 @@
 
 
   $('#year').textContent = new Date().getFullYear();
+
+  /* ------------------------------------------------ Самоперевірка ---------
+     Головна причина «сайт захостили, а заявки не йдуть» у тому, що зламане
+     надсилання ніяк себе не проявляє: форма мовчить, людина йде, ніхто не
+     дізнається. Перевіряти це вручну через справжню заявку незручно, тому
+     перевірка вбудована в сам сайт.
+
+     Відкрити САЙТ/?leadtest=1 — угорі зʼявиться панель із кнопкою. Вона
+     надсилає на той самий вебхук позначену тестову заявку і показує, що саме
+     відповів сервер. Видно і адресу, і код відповіді, і текст помилки.
+
+     Кнопка, а не автозапуск: панель не має слати нічого в CRM тільки тому,
+     що хтось відкрив посилання.
+
+     Позначка сайту як робочого (data-lead-js) стоїть тут же: якщо main.js не
+     завантажився, атрибута не буде — саме на це спирається запобіжник
+     у <head> сторінки. */
+  document.documentElement.setAttribute('data-lead-js', 'ok');
+
+  if (location.search.indexOf('leadtest') !== -1) {
+    var panel = document.createElement('div');
+    panel.className = 'leadtest';
+    panel.innerHTML =
+      '<b>Самоперевірка приймання заявок</b>' +
+      '<span class="leadtest__url"></span>' +
+      '<button type="button">Надіслати тестову заявку</button>' +
+      '<span class="leadtest__out">Натисніть кнопку — у Make має зʼявитися заявка з іменем «ТЕСТ».</span>';
+    panel.querySelector('.leadtest__url').textContent = ENDPOINT || '(адресу не вказано)';
+    document.body.appendChild(panel);
+
+    var out = panel.querySelector('.leadtest__out');
+    var btn = panel.querySelector('button');
+
+    btn.addEventListener('click', function () {
+      if (!ENDPOINT) {
+        out.textContent = 'Адреса вебхука не вказана — заявкам нікуди йти. ' +
+                          'Пропишіть ENDPOINT в assets/js/main.js.';
+        out.className = 'leadtest__out is-bad';
+        return;
+      }
+
+      btn.disabled = true;
+      out.className = 'leadtest__out';
+      out.textContent = 'Надсилаємо…';
+
+      var started = Date.now();
+
+      fetch(ENDPOINT, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: 'ТЕСТ — перевірка сайту, не передзвонювати',
+          phone: '+380000000000',
+          form_source: 'leadtest',
+          note: 'Автоматична перевірка приймання заявок після хостингу.',
+          page: location.href,
+          sentAt: new Date().toISOString()
+        })
+      })
+        .then(function (r) {
+          var ms = Date.now() - started;
+          if (r.ok) {
+            out.className = 'leadtest__out is-ok';
+            out.textContent = 'Працює. Сервер відповів ' + r.status + ' за ' + ms + ' мс. ' +
+                              'Перевірте, що в Make зʼявилася заявка з іменем «ТЕСТ», і видаліть її.';
+          } else {
+            out.className = 'leadtest__out is-bad';
+            out.textContent = 'Не працює: сервер відповів ' + r.status + '. ' +
+              (r.status === 410
+                ? 'Код 410 означає, що сценарій у Make вимкнений — увімкніть перемикач унизу ліворуч.'
+                : 'Перевірте адресу вебхука в assets/js/main.js.');
+          }
+          btn.disabled = false;
+        })
+        .catch(function (e) {
+          out.className = 'leadtest__out is-bad';
+          out.textContent = 'Не працює: запит навіть не дійшов (' + e.message + '). ' +
+            'Найчастіше це блокувальник реклами в браузері або немає доступу до мережі. ' +
+            'Спробуйте в режимі інкогніто з вимкненими розширеннями.';
+          btn.disabled = false;
+        });
+    });
+  }
 })();

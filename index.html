@@ -33,7 +33,27 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <!-- Службові позначки [ПОТРІБНІ ДАНІ] показуються лише на localhost
      або якщо додати ?draft=1 до адреси. Відвідувач їх не бачить. -->
 <script>if(location.hostname==='localhost'||location.hostname==='127.0.0.1'||location.search.indexOf('draft')!==-1){document.documentElement.className+=' is-draft';}</script>
-<link rel="stylesheet" href="assets/css/style.css">
+
+<!-- Запобіжник на випадок, коли assets/js/main.js не завантажився: не залили
+     на хостинг, віддається з помилкою, ріже блокувальник, віддається старий
+     з кешу. Без нього форма робить звичайний GET-сабміт — сторінка просто
+     перезавантажується, заявка зникає без сліду, і ніхто про це не дізнається.
+     Саме так виглядає «сайт захостили, а ліди не йдуть». -->
+<script>
+document.addEventListener('submit', function (e) { e.preventDefault(); }, true);
+window.addEventListener('load', function () {
+  if (document.documentElement.getAttribute('data-lead-js') === 'ok') return;
+  var b = document.createElement('div');
+  b.className = 'jsdown';
+  b.setAttribute('role', 'alert');
+  b.innerHTML = 'Форми на сайті зараз не працюють: не завантажився файл ' +
+    '<code>assets/js/main.js</code>. Зателефонуйте нам — ' +
+    '<a href="tel:+380739333188">+38 073 933 31 88</a> — або напишіть у ' +
+    '<a href="https://t.me/tskassistant_bot" target="_blank" rel="noopener">Telegram</a>.';
+  document.body.appendChild(b);
+});
+</script>
+<link rel="stylesheet" href="assets/css/style.css?v=3">
 </head>
 <body>
 
@@ -1386,8 +1406,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   </button>
 </div>
 
-<script src="assets/js/calc.js"></script>
-<script src="assets/js/quiz.js"></script>
-<script src="assets/js/main.js"></script>
+<script src="assets/js/calc.js?v=3"></script>
+<script src="assets/js/quiz.js?v=3"></script>
+<script src="assets/js/main.js?v=3"></script>
 </body>
 </html>
